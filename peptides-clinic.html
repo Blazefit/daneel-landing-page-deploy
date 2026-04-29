@@ -407,6 +407,98 @@
       margin-bottom: 40px;
     }
 
+    .signup-form {
+      max-width: 680px;
+      margin: 0 auto;
+      background: #fff;
+      border: 1px solid rgba(0,0,0,0.06);
+      border-radius: 28px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.08);
+      padding: 32px;
+      text-align: left;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .form-field.full { grid-column: 1 / -1; }
+
+    .form-field label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .form-field input,
+    .form-field select,
+    .form-field textarea {
+      width: 100%;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 14px;
+      padding: 14px 16px;
+      font: inherit;
+      font-size: 15px;
+      background: #fbfbfd;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-field textarea { min-height: 108px; resize: vertical; }
+
+    .form-field input:focus,
+    .form-field select:focus,
+    .form-field textarea:focus {
+      border-color: var(--blaze);
+      box-shadow: 0 0 0 4px rgba(0,113,227,0.12);
+    }
+
+    .form-actions {
+      margin-top: 22px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .form-note {
+      font-size: 13px;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-top: 14px;
+      margin-bottom: 0 !important;
+    }
+
+    .form-status {
+      display: none;
+      margin-top: 18px;
+      padding: 16px 18px;
+      border-radius: 16px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .form-status.success {
+      display: block;
+      color: #0b6b2b;
+      background: rgba(52,199,89,0.14);
+      border: 1px solid rgba(52,199,89,0.28);
+    }
+
+    .form-status.error {
+      display: block;
+      color: #9f1d1d;
+      background: rgba(255,59,48,0.12);
+      border: 1px solid rgba(255,59,48,0.24);
+    }
+
+    .hp-field { display: none; }
+
     /* FOOTER */
     .footer {
       text-align: center;
@@ -427,6 +519,9 @@
       .step-num { margin: 0 auto; }
       .cta-group { flex-direction: column; align-items: center; }
       .btn { width: 100%; max-width: 320px; justify-content: center; }
+      .signup-form { padding: 24px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-actions { flex-direction: column; align-items: stretch; }
     }
   </style>
 </head>
@@ -447,7 +542,7 @@
 
       <div class="cta-group">
         <a href="#rsvp" class="btn btn-primary">Claim My Spot — Free</a>
-        <a href="mailto:jason@crossfitblaze.com?subject=Peptide%20Clinic%20Question" class="btn btn-secondary">Submit a Question</a>
+        <a href="#rsvp" class="btn btn-secondary">Submit a Question</a>
       </div>
     </div>
   </section>
@@ -631,21 +726,120 @@
   <section class="final-cta" id="rsvp">
     <div class="container">
       <h2>Stop guessing. Start mapping.</h2>
-      <p>Spots are limited to keep it personal. Claim yours now.</p>
-      <div class="cta-group">
-        <a href="mailto:jason@crossfitblaze.com?subject=Peptide%20Clinic%20RSVP%20-%20May%209" class="btn btn-primary">Reserve My Free Spot</a>
-        <a href="tel:+12394973555" class="btn btn-secondary">Call (239) 260-5242</a>
-      </div>
+      <p>Spots are limited to keep it personal. Submit the form and we’ll hold your place.</p>
+
+      <form id="peptideSignupForm" class="signup-form" action="https://formspree.io/f/xkoqwwor" method="POST">
+        <input type="hidden" name="eventName" value="CrossFit Blaze Peptides & Biohacking Clinic">
+        <input type="hidden" name="eventDate" value="Saturday, May 9, 2026 at 9:00 AM">
+        <input type="hidden" name="_subject" value="Peptide Clinic RSVP - CrossFit Blaze">
+        <input type="hidden" id="pageUrl" name="pageUrl" value="">
+        <input type="hidden" id="queryString" name="queryString" value="">
+        <input type="hidden" id="utmSource" name="utmSource" value="">
+        <input type="hidden" id="utmMedium" name="utmMedium" value="">
+        <input type="hidden" id="utmCampaign" name="utmCampaign" value="">
+        <input class="hp-field" type="text" name="_gotcha" tabindex="-1" autocomplete="off">
+
+        <div class="form-grid">
+          <div class="form-field">
+            <label for="firstName">First name *</label>
+            <input id="firstName" name="firstName" type="text" autocomplete="given-name" required placeholder="First name">
+          </div>
+          <div class="form-field">
+            <label for="lastName">Last name *</label>
+            <input id="lastName" name="lastName" type="text" autocomplete="family-name" required placeholder="Last name">
+          </div>
+          <div class="form-field">
+            <label for="email">Email *</label>
+            <input id="email" name="email" type="email" autocomplete="email" required placeholder="you@example.com">
+          </div>
+          <div class="form-field">
+            <label for="phone">Phone</label>
+            <input id="phone" name="phone" type="tel" autocomplete="tel" placeholder="(239) 555-1234">
+          </div>
+          <div class="form-field full">
+            <label for="interest">What do you want help with?</label>
+            <select id="interest" name="primaryInterest">
+              <option value="">Select one</option>
+              <option>Fat loss / GLP-1s</option>
+              <option>Recovery / injury healing</option>
+              <option>Sleep / stress / cognition</option>
+              <option>Longevity / anti-aging</option>
+              <option>Lab interpretation</option>
+              <option>General peptide questions</option>
+            </select>
+          </div>
+          <div class="form-field full">
+            <label for="labs">Are you bringing labs?</label>
+            <select id="labs" name="bringingLabs">
+              <option value="">Select one</option>
+              <option>Yes — I have recent bloodwork</option>
+              <option>No — I want to learn what to order</option>
+              <option>Not sure yet</option>
+            </select>
+          </div>
+          <div class="form-field full">
+            <label for="question">Question or note</label>
+            <textarea id="question" name="question" placeholder="Ask your peptide/biohacking question or tell us what you want covered."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary" id="signupSubmit">Reserve My Free Spot</button>
+          <a href="tel:+12392605242" class="btn btn-secondary" style="color: var(--text); border-color: rgba(0,0,0,0.12);">Call (239) 260-5242</a>
+        </div>
+        <p class="form-note">Your RSVP goes to the CrossFit Blaze event intake form — no email app required.</p>
+        <div id="formStatus" class="form-status" role="status" aria-live="polite"></div>
+      </form>
     </div>
   </section>
 
   <!-- FOOTER -->
   <footer class="footer">
     <div class="container">
-      <p><strong>CrossFit Blaze</strong> — Naples, FL<br>
-      Questions? <a href="mailto:jason@crossfitblaze.com" style="color: var(--blaze); text-decoration: none;">jason@crossfitblaze.com</a></p>
+      <p><strong>CrossFit Blaze</strong> — 6563 Taylor Rd #8, Naples, FL<br>
+      Questions? Call <a href="tel:+12392605242" style="color: var(--blaze); text-decoration: none;">(239) 260-5242</a></p>
     </div>
   </footer>
 
+  <script>
+    const signupForm = document.getElementById('peptideSignupForm');
+    const signupSubmit = document.getElementById('signupSubmit');
+    const formStatus = document.getElementById('formStatus');
+
+    document.getElementById('pageUrl').value = window.location.href;
+    document.getElementById('queryString').value = window.location.search || '';
+    const params = new URLSearchParams(window.location.search);
+    document.getElementById('utmSource').value = params.get('utm_source') || '';
+    document.getElementById('utmMedium').value = params.get('utm_medium') || '';
+    document.getElementById('utmCampaign').value = params.get('utm_campaign') || '';
+
+    signupForm.addEventListener('submit', async (event) => {
+      event.preventDefault();
+      signupSubmit.disabled = true;
+      signupSubmit.textContent = 'Submitting...';
+      formStatus.className = 'form-status';
+      formStatus.textContent = '';
+
+      try {
+        const response = await fetch(signupForm.action, {
+          method: 'POST',
+          body: new FormData(signupForm),
+          headers: { 'Accept': 'application/json' }
+        });
+
+        if (!response.ok) throw new Error('Form submission failed');
+
+        signupForm.reset();
+        formStatus.className = 'form-status success';
+        formStatus.textContent = 'You’re in — your RSVP was submitted. We’ll see you Saturday, May 9th at 9:00 AM.';
+        signupSubmit.textContent = 'Submitted';
+      } catch (error) {
+        signupSubmit.disabled = false;
+        signupSubmit.textContent = 'Reserve My Free Spot';
+        formStatus.className = 'form-status error';
+        formStatus.textContent = 'There was a problem submitting the form. Please try again or call the gym at (239) 260-5242.';
+      }
+    });
+  </script>
 </body>
 </html>
