@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Peptide Interest Decision Matrix — CrossFit Blaze</title>
+  <meta name="description" content="Educational peptide interest questionnaire for CrossFit Blaze. One question at a time with explanation-based conversation topics." />
+  <meta name="theme-color" content="#0071e3" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blaze: #0071e3;
+      --blaze-dark: #005bb5;
+      --bg: #f5f5f7;
+      --card: #fff;
+      --ink: #1d1d1f;
+      --muted: #6e6e73;
+      --soft: #e8f2ff;
+      --border: rgba(0,0,0,.1);
+      --warning: #ff9500;
+      --danger: #ff3b30;
+      --success: #34c759;
+      --radius: 28px;
+      --shadow: 0 24px 70px rgba(0,0,0,.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at 15% 5%, rgba(0,113,227,.18), transparent 34rem),
+        radial-gradient(circle at 85% 0%, rgba(191,90,242,.12), transparent 30rem),
+        var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .shell { width: min(1060px, calc(100% - 32px)); margin: 0 auto; padding: 32px 0 56px; }
+    .hero {
+      background: linear-gradient(145deg, #05070c, #111827 62%, #0b3b76);
+      color: #fff;
+      border-radius: 34px;
+      padding: clamp(28px, 6vw, 64px);
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      right: -180px;
+      top: -180px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,113,227,.72), transparent 68%);
+      filter: blur(4px);
+      opacity: .75;
+    }
+    .hero-content { position: relative; z-index: 1; max-width: 760px; }
+    .eyebrow { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.12); border: 1px solid rgba(255,255,255,.16); font-weight: 700; font-size: 13px; letter-spacing: .02em; }
+    h1 { font-size: clamp(36px, 7vw, 72px); line-height: .96; letter-spacing: -.06em; margin: 22px 0; }
+    .hero p { color: rgba(255,255,255,.78); font-size: clamp(17px, 2vw, 21px); max-width: 690px; }
+    .notice { margin-top: 22px; padding: 15px 17px; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.16); border-radius: 18px; color: rgba(255,255,255,.86); font-size: 14px; }
+    .app { margin-top: 26px; display: grid; grid-template-columns: 310px 1fr; gap: 22px; align-items: start; }
+    .panel, .card { background: rgba(255,255,255,.86); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,.8); border-radius: var(--radius); box-shadow: 0 18px 55px rgba(0,0,0,.08); }
+    .panel { padding: 22px; position: sticky; top: 18px; }
+    .progress-text { font-size: 13px; font-weight: 800; color: var(--blaze); letter-spacing: .03em; text-transform: uppercase; }
+    .progress-track { height: 10px; background: rgba(0,0,0,.08); border-radius: 999px; overflow: hidden; margin: 12px 0 18px; }
+    .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--blaze), #64d2ff); border-radius: inherit; transition: width .25s ease; }
+    .mini-list { list-style: none; display: grid; gap: 10px; color: var(--muted); font-size: 14px; }
+    .mini-list li { padding-left: 18px; position: relative; }
+    .mini-list li::before { content: "•"; color: var(--blaze); position: absolute; left: 0; font-weight: 900; }
+    .card { padding: clamp(22px, 4vw, 36px); min-height: 520px; }
+    .question-kicker { color: var(--muted); font-size: 14px; font-weight: 700; margin-bottom: 10px; }
+    .question-title { font-size: clamp(27px, 4vw, 44px); letter-spacing: -.04em; line-height: 1.05; margin-bottom: 12px; }
+    .question-help { color: var(--muted); margin-bottom: 24px; max-width: 720px; }
+    .options { display: grid; gap: 12px; }
+    .option {
+      display: grid;
+      grid-template-columns: 26px 1fr;
+      gap: 12px;
+      align-items: start;
+      padding: 16px;
+      border: 1.5px solid var(--border);
+      border-radius: 18px;
+      background: #fff;
+      cursor: pointer;
+      transition: .18s ease;
+    }
+    .option:hover { transform: translateY(-1px); border-color: rgba(0,113,227,.35); box-shadow: 0 10px 24px rgba(0,113,227,.08); }
+    .option input { width: 20px; height: 20px; accent-color: var(--blaze); margin-top: 2px; }
+    .option strong { display: block; font-size: 16px; }
+    .option span { display: block; color: var(--muted); font-size: 13px; margin-top: 3px; }
+    textarea, input[type="text"], input[type="email"], input[type="tel"] {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 18px; padding: 15px 16px; font: inherit; outline: none; background: #fff;
+    }
+    textarea { min-height: 120px; resize: vertical; }
+    textarea:focus, input:focus { border-color: var(--blaze); box-shadow: 0 0 0 4px rgba(0,113,227,.12); }
+    .nav { display: flex; gap: 12px; justify-content: space-between; align-items: center; margin-top: 28px; flex-wrap: wrap; }
+    .btn { border: 0; border-radius: 999px; padding: 14px 20px; font-weight: 800; font-size: 15px; cursor: pointer; transition: .18s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; }
+    .btn-primary { color: #fff; background: var(--blaze); box-shadow: 0 10px 25px rgba(0,113,227,.28); }
+    .btn-primary:hover { background: var(--blaze-dark); transform: translateY(-1px); }
+    .btn-secondary { color: var(--ink); background: #fff; border: 1px solid var(--border); }
+    .btn:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .error { color: var(--danger); font-weight: 700; min-height: 22px; margin-top: 12px; }
+    .results { display: none; }
+    .result-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 18px; flex-wrap: wrap; }
+    .badge { display: inline-flex; align-items: center; gap: 8px; background: var(--soft); color: var(--blaze-dark); border-radius: 999px; padding: 8px 12px; font-size: 13px; font-weight: 800; }
+    .suggestion-grid { display: grid; gap: 14px; }
+    .suggestion { background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 18px; }
+    .suggestion.top { border-color: rgba(0,113,227,.4); box-shadow: 0 14px 35px rgba(0,113,227,.1); }
+    .suggestion h3 { font-size: 21px; letter-spacing: -.025em; margin-bottom: 8px; display: flex; justify-content: space-between; gap: 10px; }
+    .score { font-size: 13px; color: var(--blaze); background: var(--soft); padding: 5px 9px; border-radius: 999px; white-space: nowrap; }
+    .suggestion p { color: var(--muted); margin: 8px 0; }
+    .why { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip { background: #f5f5f7; border: 1px solid rgba(0,0,0,.06); color: #3a3a3c; border-radius: 999px; padding: 7px 10px; font-size: 12px; font-weight: 700; }
+    .redflag { background: #fff7ed; border: 1px solid rgba(255,149,0,.28); border-radius: 20px; padding: 16px; margin: 16px 0; color: #7a3f00; }
+    .redflag strong { color: #5d3000; }
+    .matrix { margin-top: 24px; background: #fff; border-radius: 22px; border: 1px solid var(--border); overflow: hidden; }
+    .matrix h3 { padding: 16px 18px; border-bottom: 1px solid var(--border); }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { text-align: left; padding: 12px 14px; border-bottom: 1px solid rgba(0,0,0,.06); vertical-align: top; }
+    th { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+    .footer-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 22px; }
+    .print-only { display: none; }
+
+    .report-cover {
+      background: linear-gradient(145deg, #07111f, #0b3b76);
+      color: #fff;
+      border-radius: 28px;
+      padding: clamp(22px, 4vw, 34px);
+      margin-bottom: 18px;
+      position: relative;
+      overflow: hidden;
+    }
+    .report-cover::after { content: ""; position: absolute; width: 360px; height: 360px; right: -130px; top: -130px; border-radius: 50%; background: radial-gradient(circle, rgba(100,210,255,.46), transparent 66%); }
+    .report-cover > * { position: relative; z-index: 1; }
+    .report-cover h2 { font-size: clamp(30px, 5vw, 52px); line-height: 1; letter-spacing: -.05em; margin: 12px 0; }
+    .report-cover p { color: rgba(255,255,255,.78); max-width: 760px; }
+    .report-meta { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+    .report-meta span { border: 1px solid rgba(255,255,255,.18); background: rgba(255,255,255,.1); border-radius: 999px; padding: 8px 11px; font-size: 13px; font-weight: 800; }
+    .summary-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 18px 0; }
+    .summary-card { background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 17px; }
+    .summary-card strong { display: block; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); margin-bottom: 7px; }
+    .summary-card span { display: block; font-size: 18px; font-weight: 850; letter-spacing: -.02em; }
+    .section-title { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: 26px 0 12px; }
+    .section-title h3 { font-size: 24px; letter-spacing: -.035em; }
+    .primary-result { border: 2px solid rgba(0,113,227,.42); background: linear-gradient(180deg, #fff, #f4f9ff); }
+    .rank-label { display: inline-flex; align-items: center; justify-content: center; min-width: 30px; height: 30px; border-radius: 50%; background: var(--blaze); color: #fff; font-size: 14px; margin-right: 8px; }
+    .result-copy { color: #3a3a3c; font-size: 15px; }
+    .professional-note { background: #f7f7f8; border: 1px solid rgba(0,0,0,.07); border-radius: 18px; padding: 13px 14px; color: #3a3a3c; margin-top: 12px; }
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .checklist { background: #fff; border: 1px solid var(--border); border-radius: 22px; padding: 18px; }
+    .checklist ul { margin: 10px 0 0 20px; color: var(--muted); }
+    .answer-summary { display: flex; flex-wrap: wrap; gap: 8px; }
+    .answer-summary .chip { background: #fff; }
+    .disclaimer-box { background: #fff5f5; color: #7a1712; border: 1px solid rgba(255,59,48,.2); border-radius: 20px; padding: 16px; margin-top: 18px; }
+    @media (max-width: 850px) { .summary-grid, .two-col { grid-template-columns: 1fr; } }
+
+    @media (max-width: 850px) {
+      .app { grid-template-columns: 1fr; }
+      .panel { position: static; }
+      .card { min-height: auto; }
+      table { font-size: 13px; }
+    }
+    @media print {
+      body { background: #fff; }
+      .hero, .panel, .question-card, .footer-actions { display: none !important; }
+      .shell { width: 100%; padding: 0; }
+      .card { box-shadow: none; border: 0; }
+      .results { display: block !important; }
+      .print-only { display: block; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <div class="hero-content">
+        <div class="eyebrow">CrossFit Blaze • Educational intake</div>
+        <h1>Peptide Interest Decision Matrix</h1>
+        <p>Answer 12 quick questions. You’ll get conversation topics that match your goals — with plain-English explanations for why each option may be worth discussing.</p>
+        <div class="notice"><strong>Important:</strong> This is an educational triage tool, not medical advice, diagnosis, dosing, or a prescription. Final decisions should be made with labs, history, contraindications, and a licensed clinician.</div>
+      </div>
+    </section>
+
+    <section class="app" aria-live="polite">
+      <aside class="panel">
+        <div class="progress-text" id="progressText">Ready to start</div>
+        <div class="progress-track"><div class="progress-bar" id="progressBar"></div></div>
+        <ul class="mini-list">
+          <li>One question at a time</li>
+          <li>Flags safety items before suggestions</li>
+          <li>Ranks peptide conversation topics by fit</li>
+          <li>Explains why each suggestion came up</li>
+        </ul>
+      </aside>
+
+      <section class="card question-card" id="questionCard">
+        <div class="question-kicker" id="questionKicker">Start</div>
+        <h2 class="question-title" id="questionTitle">Where are you looking for help?</h2>
+        <p class="question-help" id="questionHelp">Pick the areas you care about most. This first answer drives the matrix, then follow-up questions refine it.</p>
+        <div id="answerArea" class="options"></div>
+        <div class="error" id="errorMessage"></div>
+        <div class="nav">
+          <button class="btn btn-secondary" id="backBtn" type="button">Back</button>
+          <button class="btn btn-primary" id="nextBtn" type="button">Start questionnaire →</button>
+        </div>
+      </section>
+
+      <section class="card results" id="resultsCard">
+        <div class="report-cover">
+          <div class="eyebrow">CrossFit Blaze • Peptide Interest Report</div>
+          <h2>Your Personalized Discussion Map</h2>
+          <p>This professional summary turns your answers into ranked educational conversation topics. It is designed to help Jason understand your goals quickly and guide the clinic conversation around fit, safety, labs, and next best questions.</p>
+          <div class="report-meta">
+            <span id="completionBadge">12 answers scored</span>
+            <span>Educational only</span>
+            <span>Labs + history still required</span>
+          </div>
+        </div>
+
+        <div id="redFlagBox"></div>
+
+        <div class="summary-grid">
+          <div class="summary-card"><strong>Primary fit</strong><span id="primaryFit">—</span></div>
+          <div class="summary-card"><strong>Goal pattern</strong><span id="goalPattern">—</span></div>
+          <div class="summary-card"><strong>Readiness</strong><span id="readiness">—</span></div>
+        </div>
+
+        <div class="section-title"><h3>Recommended blends and discussion topics</h3><span class="badge">Blends prioritized when ingredients match</span></div>
+        <div class="suggestion-grid" id="suggestions"></div>
+
+        <div class="two-col">
+          <div class="checklist">
+            <div class="section-title" style="margin-top:0;"><h3>Suggested lab context</h3></div>
+            <p class="question-help">Bring these if available. Missing labs do not prevent learning, but they do limit precision.</p>
+            <ul id="labChecklist"></ul>
+          </div>
+          <div class="checklist">
+            <div class="section-title" style="margin-top:0;"><h3>Next best questions</h3></div>
+            <p class="question-help">Use these to make the clinic conversation practical and safe.</p>
+            <ul id="nextQuestions"></ul>
+          </div>
+        </div>
+
+        <div class="section-title"><h3>Your answer summary</h3></div>
+        <div class="answer-summary" id="answerSummary"></div>
+
+        <div class="matrix">
+          <h3>Decision matrix used</h3>
+          <table>
+            <thead><tr><th>If the person selects…</th><th>Then discuss…</th><th>Why</th></tr></thead>
+            <tbody id="matrixRows"></tbody>
+          </table>
+        </div>
+
+        <div class="disclaimer-box"><strong>Medical disclaimer:</strong> This report does not diagnose, treat, prescribe, or provide dosing. Peptides may have contraindications and should be considered only with appropriate labs, medical history, medication review, and licensed clinical supervision.</div>
+
+        <div class="footer-actions">
+          <button class="btn btn-primary" type="button" onclick="window.print()">Print / Save PDF</button>
+          <button class="btn btn-secondary" type="button" id="restartBtn">Retake</button>
+          <a class="btn btn-secondary" href="mailto:jason@crossfitblaze.com?subject=Peptide%20Questionnaire%20Results">Email Jason</a>
+        </div>
+        <p class="question-help print-only">Generated by the CrossFit Blaze educational peptide decision matrix.</p>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const topics = {
+      kpv: {
+        name: 'KPV', category: 'Gut / skin / inflammation', score: 0, reasons: [],
+        explain: 'KPV is commonly discussed around gut barrier irritation, inflammatory skin patterns, and immune/inflammatory signaling. It is usually not an energy peptide, so it only scores when gut, skin, or inflammation shows up.'
+      },
+      bpc: {
+        name: 'BPC-157', category: 'Gut / healing / tissue repair', score: 0, reasons: [],
+        explain: 'BPC-157 is most often discussed for tissue repair, tendon/ligament irritation, and gut-barrier conversations. It scores higher when injury or GI symptoms are primary.'
+      },
+      tb500: {
+        name: 'TB-500', category: 'Soft tissue / recovery', score: 0, reasons: [],
+        explain: 'TB-500 is usually part of healing and recovery conversations, especially broad soft-tissue issues, chronic overuse, or post-surgical recovery.'
+      },
+      ghk: {
+        name: 'GHK-Cu', category: 'Skin / wound healing / collagen', score: 0, reasons: [],
+        explain: 'GHK-Cu comes up for skin quality, collagen, hair/skin appearance, and wound-healing conversations, especially when skin health overlaps with recovery.'
+      },
+      cjcIpa: {
+        name: 'CJC-1295 + Ipamorelin', category: 'Sleep / recovery / GH-axis', score: 0, reasons: [],
+        explain: 'This combo is generally discussed around sleep quality, recovery, body composition, and GH/IGF-1 pathway support — ideally after checking labs and sleep/stress bottlenecks.'
+      },
+      glp: {
+        name: 'GLP-1 pathway: Tirzepatide / Semaglutide', category: 'Weight / appetite / glucose', score: 0, reasons: [],
+        explain: 'GLP-1/GIP conversations are most relevant when appetite, weight-loss resistance, A1c/glucose, insulin resistance, or metabolic risk is part of the picture.'
+      },
+      mots: {
+        name: 'MOTS-c / SS-31', category: 'Mitochondrial energy / longevity', score: 0, reasons: [],
+        explain: 'MOTS-c and SS-31 are often discussed in mitochondrial-health, stamina, fatigue, and longevity contexts. They score when energy is the goal without an obvious sleep-only explanation.'
+      },
+      semaxSelank: {
+        name: 'Semax / Selank', category: 'Focus / mood / stress resilience', score: 0, reasons: [],
+        explain: 'Semax and Selank are usually discussed for focus, verbal fluency, mental stamina, anxiety/stress resilience, and cognition — not gut or skin problems.'
+      },
+      thymosin: {
+        name: 'Thymosin Alpha-1 / LL-37', category: 'Immune modulation', score: 0, reasons: [],
+        explain: 'These come up when immune resilience, recurrent illness, autoimmune/inflammatory history, or infection-related questions are present. They require extra caution and clinician context.'
+      },
+      epitalon: {
+        name: 'Epitalon', category: 'Longevity / sleep rhythm', score: 0, reasons: [],
+        explain: 'Epitalon is usually a longevity and circadian-rhythm discussion topic. It scores only when anti-aging, sleep rhythm, or long-horizon health optimization is the stated goal.'
+      },
+      pt141: {
+        name: 'PT-141 / Kisspeptin discussion', category: 'Libido / hormones', score: 0, reasons: [],
+        explain: 'These are sexual-health and hormone-axis conversation topics. They should be paired with hormone labs and a review of cardiovascular, medication, and endocrine context.'
+      },
+      glowBlend: {
+        name: 'Glow Blend discussion: KPV + GHK-Cu', category: 'Blend / skin inflammation / collagen', score: 0, reasons: [],
+        explain: 'Glow Blend is the preferred top-level discussion when the questionnaire is pointing to both inflammatory skin support and skin-quality/collagen support. Instead of listing KPV and GHK-Cu separately first, this blend groups the matching ingredients into one clearer conversation.'
+      },
+      gutSkinBlend: {
+        name: 'Gut + Skin Blend discussion: KPV + BPC-157 + GHK-Cu', category: 'Blend / gut-skin axis', score: 0, reasons: [],
+        explain: 'This blend-style discussion is useful when gut irritation and skin inflammation show up together. It connects KPV for inflammatory signaling, BPC-157 for gut/healing context, and GHK-Cu for skin/collagen support.'
+      },
+      wolverineStack: {
+        name: 'Wolverine Stack discussion: BPC-157 + TB-500', category: 'Blend / injury recovery', score: 0, reasons: [],
+        explain: 'When the answers point strongly toward soft-tissue injury, tendon irritation, or recovery, the blend/stack conversation should usually appear above the individual ingredients because BPC-157 and TB-500 are commonly discussed together.'
+      },
+      klowStack: {
+        name: 'KLOW Stack discussion: BPC-157 + TB-500 + KPV + GHK-Cu', category: 'Blend / healing + inflammation + skin', score: 0, reasons: [],
+        explain: 'KLOW Stack becomes relevant when there is overlap between healing/recovery, inflammation, gut or skin issues, and collagen/wound-healing goals. It is a broader blend conversation rather than a single-compound suggestion.'
+      },
+      metabolicRecoveryBlend: {
+        name: 'Metabolic Recovery Blend discussion: GLP-1 pathway + MOTS-c / SS-31', category: 'Blend / metabolism + energy', score: 0, reasons: [],
+        explain: 'This discussion fits when weight/appetite/glucose issues overlap with low energy or stamina. It separates metabolic appetite control from mitochondrial energy support rather than forcing one single lane.'
+      },
+      labsFirst: {
+        name: 'Labs-first assessment', category: 'Safety / personalization', score: 0, reasons: [],
+        explain: 'When symptoms are broad or labs are missing, the best next step is often not a peptide — it is bloodwork, history, sleep, nutrition, thyroid/metabolic review, and contraindication screening.'
+      }
+    };
+
+    const questions = [
+      { id: 'goals', type: 'checkbox', required: true, title: 'Where are you looking for help?', help: 'Choose up to three. This makes the questionnaire feel personal instead of starting with a peptide list.', options: [
+        ['gut', 'Gut health', 'Bloating, IBS-type symptoms, reflux, food sensitivity, gut barrier questions'],
+        ['skin', 'Skin / hair / appearance', 'Acne, rosacea, rashes, wound healing, collagen, skin quality'],
+        ['energy', 'Energy / stamina', 'Fatigue, low drive, endurance drop-off'],
+        ['fatloss', 'Fat loss / metabolic health', 'Appetite, weight-loss resistance, glucose/A1c, insulin'],
+        ['injury', 'Injury / joint / tendon recovery', 'Acute or chronic soft-tissue issues'],
+        ['sleep', 'Sleep / recovery', 'Poor sleep, soreness, low HRV, training recovery'],
+        ['focus', 'Focus / mood / stress', 'Mental stamina, anxiety, motivation, verbal fluency'],
+        ['immune', 'Immune / inflammation', 'Recurrent illness, autoimmune/inflammatory questions'],
+        ['hormones', 'Libido / hormone support', 'Low libido, sexual function, testosterone questions'],
+        ['longevity', 'Longevity / anti-aging', 'Long-term optimization, mitochondrial health, aging']
+      ], max: 3 },
+      { id: 'gutSymptoms', type: 'radio', required: true, title: 'Any gut symptoms?', help: 'Gut answers route toward KPV/BPC only when there is a real GI pattern.', options: [
+        ['none', 'No major gut issue', 'Nothing significant right now'],
+        ['mild', 'Mild or occasional', 'Bloating, irregularity, food reactions sometimes'],
+        ['moderate', 'Moderate / recurring', 'IBS-type pattern, reflux, sensitivity, frequent bloating'],
+        ['severe', 'Severe or diagnosed GI condition', 'IBD/SIBO/ulcers/major GI diagnosis — clinician review first']
+      ]},
+      { id: 'skinSymptoms', type: 'radio', required: true, title: 'What best describes skin or tissue concerns?', help: 'This separates appearance-only goals from inflammation/wound-healing patterns.', options: [
+        ['none', 'No skin concern', 'Not a priority'],
+        ['appearance', 'Skin quality / collagen / hair', 'Appearance, elasticity, hair, fine lines'],
+        ['rosacea', 'Rosacea / redness / flushing', 'Facial redness, flushing, irritation, inflammatory skin sensitivity'],
+        ['inflammatory', 'Inflammatory skin pattern', 'Acne, rash, irritation, flare-ups'],
+        ['wound', 'Slow wound healing', 'Cuts, wounds, scars, or post-procedure healing are slow']
+      ]},
+      { id: 'energyPattern', type: 'radio', required: true, title: 'What does low energy feel like?', help: 'Energy can be mitochondrial, sleep-related, metabolic, thyroid, or stress-related — the matrix should not assume.', options: [
+        ['none', 'Energy is fine', 'No major fatigue issue'],
+        ['morning', 'Wake up tired', 'Sleep quality or recovery may be the first bottleneck'],
+        ['afternoon', 'Afternoon crash', 'Can point toward glucose, stress, or sleep debt'],
+        ['training', 'Training stamina dropped', 'Endurance/recovery/mitochondrial discussion may fit'],
+        ['constant', 'Constant fatigue', 'Labs-first: thyroid, CBC, CMP, hormones, glucose, sleep']
+      ]},
+      { id: 'metabolic', type: 'radio', required: true, title: 'Any appetite, weight, or glucose concern?', help: 'This is where GLP-1 pathways become relevant — not for someone who only selected skin or focus.', options: [
+        ['none', 'No metabolic concern', 'Weight/appetite/glucose are not priorities'],
+        ['appetite', 'Appetite or cravings are the issue', 'Hunger, food noise, cravings'],
+        ['resistant', 'Weight-loss resistance', 'Training and diet are decent but progress is stalled'],
+        ['labs', 'A1c / fasting glucose / insulin concern', 'Known prediabetes, diabetes range, or insulin resistance'],
+        ['recomp', 'Lean recomp only', 'Already healthy; just wants body-composition optimization']
+      ]},
+      { id: 'injury', type: 'radio', required: true, title: 'Any current injury or recovery problem?', help: 'Healing peptides should score based on tissue context, not general wellness curiosity.', options: [
+        ['none', 'No injury', 'Nothing active'],
+        ['acute', 'Acute soft-tissue injury under 6 weeks', 'New strain, sprain, tendon/ligament issue'],
+        ['chronic', 'Chronic tendon/joint/overuse issue', 'Nagging tendon, joint, or repetitive-use problem'],
+        ['postSurgery', 'Post-surgical or procedure recovery', 'Healing support conversation with clinician clearance'],
+        ['slowRecovery', 'Training recovery is poor', 'Soreness, poor recovery, repeated flare-ups']
+      ]},
+      { id: 'sleepStress', type: 'radio', required: true, title: 'How are sleep and stress?', help: 'Poor sleep can make energy, hormones, weight loss, and recovery look like peptide problems.', options: [
+        ['good', 'Good sleep / manageable stress', 'Not a major bottleneck'],
+        ['sleep', 'Sleep is poor', 'Trouble falling asleep, staying asleep, or waking rested'],
+        ['stress', 'Stress is high', 'High sympathetic load, anxiety, work/life stress'],
+        ['both', 'Both are poor', 'Sleep and stress should be addressed before complex protocols']
+      ]},
+      { id: 'cognition', type: 'radio', required: true, title: 'Any focus, mood, or mental-performance goal?', help: 'This routes toward Semax/Selank only when cognitive or stress resilience is actually part of the story.', options: [
+        ['none', 'No cognitive goal', 'Not a priority'],
+        ['focus', 'Focus / memory / verbal fluency', 'Work output, attention, learning, mental sharpness'],
+        ['stressMood', 'Stress resilience / mood', 'Anxiety, stress reactivity, low motivation'],
+        ['brainFog', 'Brain fog with fatigue', 'Labs-first plus sleep/metabolic review']
+      ]},
+      { id: 'immune', type: 'radio', required: true, title: 'Any immune or inflammatory history?', help: 'Immune peptides require extra caution. This question keeps those suggestions conservative.', options: [
+        ['none', 'No immune issue', 'No recurring illness or autoimmune diagnosis'],
+        ['inflammation', 'General inflammation / flare-ups', 'Joint aches, skin/gut flares, inflammatory pattern'],
+        ['recurrent', 'I get sick often', 'Recurring infections or poor immune resilience'],
+        ['autoimmune', 'Autoimmune condition', 'Requires clinician involvement before immune-modulating compounds']
+      ]},
+      { id: 'labs', type: 'radio', required: true, title: 'Do you have recent labs?', help: 'The more broad or hormonal the goal, the more labs matter before recommendations.', options: [
+        ['current', 'Yes — within 90 days', 'CBC/CMP/lipids/A1c/hormones/thyroid if relevant'],
+        ['old', 'Yes, but older than 90 days', 'Useful context, but may need updating'],
+        ['none', 'No recent labs', 'Matrix should emphasize labs-first before protocol choice'],
+        ['notSure', 'Not sure what I have', 'Bring anything you have and identify gaps']
+      ]},
+      { id: 'redFlags', type: 'checkbox', required: true, title: 'Any safety items we should know?', help: 'This does not disqualify someone from learning; it tells us when the answer should be “medical supervision first.”', options: [
+        ['none', 'None of these', 'No obvious safety item selected'],
+        ['pregnancy', 'Pregnant / trying to conceive', 'Avoid peptide protocols unless directed by clinician'],
+        ['cancer', 'Active or recent cancer history', 'Growth-signaling compounds require medical clearance'],
+        ['kidneyLiver', 'Kidney or liver disease', 'Safety labs and clinician review required'],
+        ['diabetesMeds', 'Diabetes meds / insulin / hypoglycemia risk', 'GLP-1 and glucose changes need medical management'],
+        ['immuneSuppress', 'Immunosuppressants or autoimmune treatment', 'Immune-modulating peptides require clinician context']
+      ]},
+      { id: 'notes', type: 'textarea', required: false, title: 'Anything else you want Jason to know?', help: 'Optional. Add current peptides, meds, injuries, labs, or what you want explained at the clinic.', placeholder: 'Example: I mostly care about gut inflammation and skin flare-ups, but energy is fine.' }
+    ];
+
+    const rules = [
+      { when: 'Gut health, IBS/SIBO-type symptoms, gut barrier questions', adds: ['KPV', 'BPC-157'], why: 'KPV fits inflammatory gut/skin patterns; BPC-157 fits gut barrier and healing conversations.' },
+      { when: 'Skin irritation, acne, rosacea, rashes, collagen, or wound healing', adds: ['Glow Blend: KPV + GHK-Cu', 'KPV', 'GHK-Cu'], why: 'A blend should rise above separate ingredients when inflammatory skin and skin-quality/collagen signals overlap.' },
+      { when: 'Low energy or stamina without a clear sleep-only cause', adds: ['MOTS-c / SS-31'], why: 'Mitochondrial topics fit energy/stamina better than KPV.' },
+      { when: 'Appetite, weight-loss resistance, A1c/glucose/insulin concerns', adds: ['Tirzepatide / Semaglutide'], why: 'GLP-1/GIP pathways match metabolic and appetite problems.' },
+      { when: 'Acute injury, chronic tendon issue, post-surgical recovery', adds: ['BPC-157', 'TB-500', 'GHK-Cu'], why: 'These are the main tissue-repair and recovery conversation topics.' },
+      { when: 'Sleep/recovery bottleneck or low-normal GH/IGF-1 context', adds: ['CJC-1295 + Ipamorelin'], why: 'GH-axis support is most relevant to recovery, sleep quality, and body composition after labs.' },
+      { when: 'Focus, mood, verbal fluency, stress resilience', adds: ['Semax / Selank'], why: 'These are cognitive/stress-resilience topics, not gut/skin/energy-first tools.' },
+      { when: 'Recurrent illness, autoimmune or immune/inflammatory history', adds: ['Thymosin Alpha-1 / LL-37'], why: 'Immune-modulating compounds require context and caution.' },
+      { when: 'Long-term optimization / anti-aging / circadian rhythm', adds: ['Epitalon', 'MOTS-c / SS-31'], why: 'Longevity routing favors circadian and mitochondrial conversations.' },
+      { when: 'No recent labs, broad fatigue, hormones, or multiple systems', adds: ['Labs-first assessment'], why: 'The safest useful next step is assessment before choosing a compound.' }
+    ];
+
+    let index = -1;
+    const answers = {};
+    const $ = (id) => document.getElementById(id);
+
+    function cloneTopics() {
+      return JSON.parse(JSON.stringify(topics));
+    }
+
+    function add(topicMap, key, points, reason) {
+      if (!topicMap[key]) return;
+      topicMap[key].score += points;
+      if (!topicMap[key].reasons.includes(reason)) topicMap[key].reasons.push(reason);
+    }
+
+    function has(id, value) {
+      const answer = answers[id];
+      if (Array.isArray(answer)) return answer.includes(value);
+      return answer === value;
+    }
+
+    function selected(id) {
+      const answer = answers[id];
+      return Array.isArray(answer) ? answer : (answer ? [answer] : []);
+    }
+
+    function renderStart() {
+      index = -1;
+      $('questionKicker').textContent = 'Start';
+      $('questionTitle').textContent = 'Where are you looking for help?';
+      $('questionHelp').textContent = 'Pick the areas you care about most. This first answer drives the matrix, then follow-up questions refine it.';
+      $('answerArea').innerHTML = '<button class="btn btn-primary" type="button" onclick="nextQuestion()">Start questionnaire →</button><p class="question-help" style="margin-top:18px;">Takes about 2 minutes. At the end, you’ll see ranked conversation topics and why they matched.</p>';
+      $('backBtn').style.display = 'none';
+      $('nextBtn').style.display = 'none';
+      updateProgress();
+    }
+
+    function renderQuestion() {
+      const q = questions[index];
+      $('questionKicker').textContent = `Question ${index + 1} of ${questions.length}`;
+      $('questionTitle').textContent = q.title;
+      $('questionHelp').textContent = q.help;
+      $('errorMessage').textContent = '';
+      $('backBtn').style.display = index === 0 ? 'inline-flex' : 'inline-flex';
+      $('nextBtn').style.display = 'inline-flex';
+      $('backBtn').disabled = false;
+      $('nextBtn').textContent = index === questions.length - 1 ? 'See suggestions →' : 'Next →';
+      let html = '';
+      if (q.type === 'radio' || q.type === 'checkbox') {
+        html = q.options.map(([value, label, desc]) => {
+          const checked = has(q.id, value) ? 'checked' : '';
+          return `<label class="option"><input type="${q.type}" name="${q.id}" value="${value}" ${checked}><div><strong>${label}</strong><span>${desc}</span></div></label>`;
+        }).join('');
+      } else if (q.type === 'textarea') {
+        const value = answers[q.id] || '';
+        html = `<textarea id="textAnswer" placeholder="${q.placeholder || ''}">${escapeHtml(value)}</textarea>`;
+      }
+      $('answerArea').innerHTML = html;
+      if (q.max) {
+        $('answerArea').querySelectorAll('input').forEach(input => {
+          input.addEventListener('change', () => {
+            const checked = [...$('answerArea').querySelectorAll('input:checked')];
+            if (checked.length > q.max) {
+              input.checked = false;
+              $('errorMessage').textContent = `Choose up to ${q.max}.`;
+            } else {
+              $('errorMessage').textContent = '';
+            }
+          });
+        });
+      }
+      updateProgress();
+    }
+
+    function escapeHtml(str) {
+      return String(str).replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+    }
+
+    function getCurrentAnswer() {
+      const q = questions[index];
+      if (q.type === 'radio') return $('answerArea').querySelector('input:checked')?.value || '';
+      if (q.type === 'checkbox') return [...$('answerArea').querySelectorAll('input:checked')].map(i => i.value);
+      if (q.type === 'textarea') return $('textAnswer').value.trim();
+      return '';
+    }
+
+    function validate(answer) {
+      const q = questions[index];
+      if (!q.required) return true;
+      if (Array.isArray(answer) && answer.length === 0) return false;
+      if (!Array.isArray(answer) && !answer) return false;
+      if (q.id === 'redFlags' && Array.isArray(answer) && answer.includes('none') && answer.length > 1) {
+        $('errorMessage').textContent = 'Choose either “None of these” or the relevant safety items — not both.';
+        return false;
+      }
+      return true;
+    }
+
+    function nextQuestion() {
+      if (index >= 0) {
+        const answer = getCurrentAnswer();
+        if (!validate(answer)) {
+          if (!$('errorMessage').textContent) $('errorMessage').textContent = 'Please answer this question to continue.';
+          return;
+        }
+        answers[questions[index].id] = answer;
+      }
+      if (index < questions.length - 1) {
+        index += 1;
+        renderQuestion();
+      } else {
+        showResults();
+      }
+    }
+
+    function backQuestion() {
+      if (index <= 0) return renderStart();
+      index -= 1;
+      renderQuestion();
+    }
+
+    function updateProgress() {
+      const completed = Math.max(0, index);
+      const percent = index < 0 ? 0 : Math.round((index / questions.length) * 100);
+      $('progressBar').style.width = `${percent}%`;
+      $('progressText').textContent = index < 0 ? 'Ready to start' : `${Math.min(index + 1, questions.length)} of ${questions.length} • ${questions.length - index - 1} remaining`;
+    }
+
+    function score() {
+      const t = cloneTopics();
+      selected('goals').forEach(goal => {
+        if (goal === 'gut') { add(t, 'kpv', 4, 'Gut health selected'); add(t, 'bpc', 3, 'Gut health selected'); }
+        if (goal === 'skin') { add(t, 'kpv', 3, 'Skin health selected'); add(t, 'ghk', 4, 'Skin health selected'); }
+        if (goal === 'energy') { add(t, 'mots', 4, 'Energy/stamina selected'); add(t, 'labsFirst', 1, 'Energy can have many causes'); }
+        if (goal === 'fatloss') { add(t, 'glp', 5, 'Fat loss/metabolic health selected'); }
+        if (goal === 'injury') { add(t, 'bpc', 4, 'Injury/recovery selected'); add(t, 'tb500', 4, 'Injury/recovery selected'); }
+        if (goal === 'sleep') { add(t, 'cjcIpa', 4, 'Sleep/recovery selected'); add(t, 'epitalon', 1, 'Sleep rhythm may matter'); }
+        if (goal === 'focus') { add(t, 'semaxSelank', 5, 'Focus/mood/stress selected'); }
+        if (goal === 'immune') { add(t, 'thymosin', 4, 'Immune/inflammation selected'); add(t, 'kpv', 2, 'Inflammation overlap'); }
+        if (goal === 'hormones') { add(t, 'pt141', 4, 'Libido/hormone support selected'); add(t, 'labsFirst', 2, 'Hormone labs needed'); }
+        if (goal === 'longevity') { add(t, 'epitalon', 4, 'Longevity selected'); add(t, 'mots', 3, 'Longevity/mitochondria overlap'); }
+      });
+
+      if (has('gutSymptoms','mild')) { add(t,'kpv',2,'Mild GI pattern'); add(t,'bpc',1,'Mild GI pattern'); }
+      if (has('gutSymptoms','moderate')) { add(t,'kpv',4,'Recurring GI symptoms'); add(t,'bpc',3,'Recurring GI symptoms'); }
+      if (has('gutSymptoms','severe')) { add(t,'labsFirst',5,'Severe/diagnosed GI condition'); add(t,'kpv',1,'GI inflammation topic only after clinician review'); }
+
+      if (has('skinSymptoms','appearance')) { add(t,'ghk',4,'Skin quality/collagen goal'); }
+      if (has('skinSymptoms','rosacea')) { add(t,'kpv',5,'Rosacea/redness inflammatory skin pattern'); add(t,'ghk',3,'Skin barrier/collagen support overlap'); }
+      if (has('skinSymptoms','inflammatory')) { add(t,'kpv',4,'Inflammatory skin pattern'); add(t,'ghk',1,'Skin-support overlap'); }
+      if (has('skinSymptoms','wound')) { add(t,'ghk',4,'Slow wound healing'); add(t,'bpc',2,'Healing overlap'); add(t,'tb500',2,'Healing overlap'); }
+
+      if (has('energyPattern','morning')) { add(t,'cjcIpa',2,'Wake up tired / recovery bottleneck'); add(t,'labsFirst',2,'Sleep and labs should be checked'); }
+      if (has('energyPattern','afternoon')) { add(t,'glp',2,'Afternoon crash may relate to glucose/appetite'); add(t,'labsFirst',2,'Glucose/thyroid/cortisol context needed'); }
+      if (has('energyPattern','training')) { add(t,'mots',4,'Training stamina drop'); add(t,'cjcIpa',2,'Recovery overlap'); }
+      if (has('energyPattern','constant')) { add(t,'labsFirst',5,'Constant fatigue needs labs-first review'); add(t,'mots',1,'Mitochondrial topic after basics'); }
+
+      if (has('metabolic','appetite')) add(t,'glp',4,'Appetite/cravings are the issue');
+      if (has('metabolic','resistant')) { add(t,'glp',4,'Weight-loss resistance'); add(t,'mots',1,'Body composition overlap'); }
+      if (has('metabolic','labs')) { add(t,'glp',5,'A1c/glucose/insulin concern'); add(t,'labsFirst',2,'Metabolic labs drive choices'); }
+      if (has('metabolic','recomp')) { add(t,'mots',2,'Lean recomp goal'); add(t,'cjcIpa',2,'Recovery/body composition overlap'); }
+
+      if (has('injury','acute')) { add(t,'bpc',4,'Acute soft-tissue injury'); add(t,'tb500',4,'Acute soft-tissue injury'); }
+      if (has('injury','chronic')) { add(t,'bpc',5,'Chronic tendon/joint issue'); add(t,'tb500',4,'Chronic tendon/joint issue'); add(t,'ghk',2,'Collagen/tissue support overlap'); }
+      if (has('injury','postSurgery')) { add(t,'bpc',3,'Post-surgical recovery'); add(t,'tb500',4,'Post-surgical recovery'); add(t,'thymosin',2,'Immune/recovery context'); add(t,'labsFirst',3,'Clinician clearance needed after surgery'); }
+      if (has('injury','slowRecovery')) { add(t,'cjcIpa',3,'Poor training recovery'); add(t,'tb500',2,'Recovery overlap'); add(t,'mots',2,'Stamina/recovery overlap'); }
+
+      if (has('sleepStress','sleep')) { add(t,'cjcIpa',4,'Poor sleep'); add(t,'epitalon',2,'Sleep rhythm topic'); }
+      if (has('sleepStress','stress')) { add(t,'semaxSelank',3,'High stress'); add(t,'labsFirst',1,'Stress can distort hormones/recovery'); }
+      if (has('sleepStress','both')) { add(t,'cjcIpa',3,'Sleep and stress both poor'); add(t,'semaxSelank',3,'Stress resilience goal'); add(t,'labsFirst',3,'Fix bottlenecks before complex stacks'); }
+
+      if (has('cognition','focus')) add(t,'semaxSelank',5,'Focus/memory/verbal fluency goal');
+      if (has('cognition','stressMood')) add(t,'semaxSelank',4,'Stress resilience/mood goal');
+      if (has('cognition','brainFog')) { add(t,'labsFirst',4,'Brain fog with fatigue needs root-cause review'); add(t,'semaxSelank',1,'Cognition topic after basics'); }
+
+      if (has('immune','inflammation')) { add(t,'kpv',3,'General inflammation/flare-ups'); add(t,'thymosin',2,'Inflammation/immune context'); }
+      if (has('immune','recurrent')) add(t,'thymosin',4,'Recurrent illness');
+      if (has('immune','autoimmune')) { add(t,'thymosin',2,'Autoimmune context requires caution'); add(t,'kpv',2,'Inflammation overlap'); add(t,'labsFirst',5,'Autoimmune condition needs clinician review'); }
+
+      if (has('labs','none')) add(t,'labsFirst',6,'No recent labs');
+      if (has('labs','old')) add(t,'labsFirst',3,'Labs may need updating');
+      if (has('labs','notSure')) add(t,'labsFirst',3,'Need to identify lab gaps');
+
+      const red = selected('redFlags').filter(x => x !== 'none');
+      if (red.length) add(t,'labsFirst',8,'Safety items selected');
+      if (has('redFlags','diabetesMeds')) add(t,'glp',-3,'GLP-1 discussion requires medical management with diabetes meds');
+      if (has('redFlags','cancer')) { add(t,'cjcIpa',-4,'Avoid growth-signaling discussion without clearance'); add(t,'bpc',-2,'Growth/healing signaling needs clearance'); }
+      if (has('redFlags','pregnancy')) Object.keys(t).forEach(k => { if (k !== 'labsFirst') add(t,k,-5,'Pregnancy/trying to conceive: clinician only'); });
+
+      // Blend/stack layer: if the individual ingredients all match, lift the named blend above the parts.
+      const skinInflammation = has('skinSymptoms','inflammatory') || has('skinSymptoms','rosacea') || selected('goals').includes('skin') || has('immune','inflammation');
+      const gutSignal = ['mild','moderate','severe'].some(v => has('gutSymptoms', v)) || selected('goals').includes('gut');
+      const injurySignal = ['acute','chronic','postSurgery','slowRecovery'].some(v => has('injury', v)) || selected('goals').includes('injury');
+      const metabolicSignal = ['appetite','resistant','labs','recomp'].some(v => has('metabolic', v)) || selected('goals').includes('fatloss');
+      const energySignal = ['training','constant','afternoon'].some(v => has('energyPattern', v)) || selected('goals').includes('energy');
+
+      if (skinInflammation && t.kpv.score > 0 && t.ghk.score > 0) {
+        add(t,'glowBlend', t.kpv.score + t.ghk.score + 3, 'KPV + GHK-Cu ingredients both matched');
+        if (has('skinSymptoms','rosacea')) add(t,'glowBlend', 5, 'Rosacea/redness pattern specifically selected');
+        if (has('skinSymptoms','inflammatory')) add(t,'glowBlend', 3, 'Acne/rash-style inflammatory skin pattern');
+      }
+      if (gutSignal && skinInflammation && t.kpv.score > 0 && t.bpc.score > 0 && t.ghk.score > 0) {
+        add(t,'gutSkinBlend', t.kpv.score + t.bpc.score + t.ghk.score + 5, 'Gut symptoms and skin inflammation overlap');
+      }
+      if (injurySignal && t.bpc.score > 0 && t.tb500.score > 0) {
+        add(t,'wolverineStack', t.bpc.score + t.tb500.score + 2, 'BPC-157 + TB-500 ingredients both matched');
+      }
+      if ((injurySignal || gutSignal) && skinInflammation && t.bpc.score > 0 && t.tb500.score > 0 && t.kpv.score > 0 && t.ghk.score > 0) {
+        add(t,'klowStack', t.bpc.score + t.tb500.score + t.kpv.score + t.ghk.score, 'KLOW ingredient pattern matched across healing, inflammation, and skin/gut');
+      }
+      if (metabolicSignal && energySignal && t.glp.score > 0 && t.mots.score > 0) {
+        add(t,'metabolicRecoveryBlend', t.glp.score + t.mots.score + 2, 'Metabolic and energy pathways both matched');
+      }
+
+      return Object.values(t)
+        .filter(x => x.score > 0)
+        .sort((a,b) => b.score - a.score)
+        .slice(0, 6);
+    }
+
+    function redFlagText() {
+      const labels = {
+        pregnancy: 'pregnancy / trying to conceive', cancer: 'active or recent cancer history', kidneyLiver: 'kidney or liver disease', diabetesMeds: 'diabetes medication / insulin / hypoglycemia risk', immuneSuppress: 'immunosuppressants or autoimmune treatment'
+      };
+      const red = selected('redFlags').filter(x => x !== 'none');
+      if (!red.length) return '';
+      return `<div class="redflag"><strong>Medical-supervision-first flag:</strong> You selected ${red.map(x => labels[x]).join(', ')}. Treat the peptide list below as discussion topics only. Bring labs and medication history, and do not start a protocol without clinician clearance.</div>`;
+    }
+
+
+    function labelFor(questionId, value) {
+      const q = questions.find(x => x.id === questionId);
+      if (!q || !q.options) return value;
+      const opt = q.options.find(x => x[0] === value);
+      return opt ? opt[1] : value;
+    }
+
+    function goalPatternText() {
+      const goals = selected('goals').map(v => labelFor('goals', v).split(' / ')[0]);
+      return goals.length ? goals.join(' + ') : 'General wellness';
+    }
+
+    function readinessText() {
+      const red = selected('redFlags').filter(x => x !== 'none');
+      if (red.length) return 'Clinician-first';
+      if (has('labs','none') || has('labs','notSure')) return 'Labs recommended';
+      if (has('labs','old')) return 'Update labs';
+      return 'Ready for discussion';
+    }
+
+    function labChecklistItems() {
+      const items = new Set(['CBC', 'CMP', 'Fasting glucose + insulin', 'HbA1c', 'Lipid panel']);
+      if (selected('goals').some(g => ['fatloss','energy','longevity'].includes(g)) || has('energyPattern','afternoon') || has('metabolic','labs')) {
+        ['Fasting insulin', 'ApoB if available', 'hs-CRP'].forEach(x => items.add(x));
+      }
+      if (selected('goals').some(g => ['sleep','hormones','energy'].includes(g)) || has('sleepStress','both')) {
+        ['Total + free testosterone', 'Estradiol', 'SHBG', 'DHEA-S', 'AM cortisol'].forEach(x => items.add(x));
+      }
+      if (has('energyPattern','constant') || has('cognition','brainFog') || selected('goals').includes('energy')) {
+        ['TSH', 'Free T3', 'Free T4', 'Reverse T3 if available', 'Ferritin', 'Vitamin D', 'B12'].forEach(x => items.add(x));
+      }
+      if (selected('goals').includes('immune') || has('immune','autoimmune') || has('gutSymptoms','severe')) {
+        ['hs-CRP', 'ESR if ordered by clinician', 'Relevant autoimmune/GI workup from physician'].forEach(x => items.add(x));
+      }
+      if (selected('goals').includes('sleep') || has('injury','slowRecovery')) items.add('IGF-1');
+      return [...items];
+    }
+
+    function nextQuestionItems(ranked) {
+      const top = ranked[0]?.name || 'Labs-first assessment';
+      const items = [
+        `What labs or history would confirm whether ${top} is actually appropriate?`,
+        'What should be fixed first: sleep, nutrition, training load, glucose control, thyroid, hormones, or inflammation?',
+        'What contraindications, medications, or diagnoses would make this a bad fit?'
+      ];
+      if (selected('goals').includes('gut')) items.push('Are symptoms pointing more toward gut barrier irritation, food intolerance, infection/SIBO, or inflammation?');
+      if (selected('goals').includes('energy')) items.push('Is the energy issue mitochondrial, sleep-driven, metabolic, thyroid-related, or stress-related?');
+      if (selected('goals').includes('injury')) items.push('What tissue is involved, how long has it been going on, and has imaging or diagnosis confirmed it?');
+      return items.slice(0,5);
+    }
+
+    function renderAnswerSummary() {
+      const chips = [];
+      questions.forEach(q => {
+        if (q.id === 'notes') return;
+        const ans = answers[q.id];
+        if (!ans || (Array.isArray(ans) && !ans.length)) return;
+        const vals = Array.isArray(ans) ? ans : [ans];
+        vals.forEach(v => chips.push(`<span class="chip"><strong>${escapeHtml(q.title.replace('?',''))}:</strong> ${escapeHtml(labelFor(q.id, v))}</span>`));
+      });
+      return chips.join('');
+    }
+
+    function showResults() {
+      $('questionCard').style.display = 'none';
+      $('resultsCard').style.display = 'block';
+      $('progressBar').style.width = '100%';
+      $('progressText').textContent = 'Complete';
+      $('completionBadge').textContent = `${questions.length} answers scored`;
+      $('redFlagBox').innerHTML = redFlagText();
+      const ranked = score();
+      $('primaryFit').textContent = ranked[0]?.name || 'Labs-first assessment';
+      $('goalPattern').textContent = goalPatternText();
+      $('readiness').textContent = readinessText();
+      $('suggestions').innerHTML = ranked.map((s, i) => `
+        <article class="suggestion ${i === 0 ? 'top primary-result' : ''}">
+          <h3><span><span class="rank-label">${i + 1}</span>${s.name}</span><span class="score">Fit score ${s.score}</span></h3>
+          <div class="badge">${s.category}</div>
+          <p class="result-copy">${s.explain}</p>
+          <div class="professional-note"><strong>How to use this result:</strong> Discuss whether your symptoms, labs, medical history, and current medications support this as a reasonable education topic. This is not a recommendation to start it.</div>
+          <p style="margin-top:14px;"><strong>Why it matched your answers:</strong></p>
+          <div class="why">${s.reasons.slice(0,6).map(r => `<span class="chip">${escapeHtml(r)}</span>`).join('')}</div>
+        </article>
+      `).join('');
+      $('labChecklist').innerHTML = labChecklistItems().map(x => `<li>${escapeHtml(x)}</li>`).join('');
+      $('nextQuestions').innerHTML = nextQuestionItems(ranked).map(x => `<li>${escapeHtml(x)}</li>`).join('');
+      $('answerSummary').innerHTML = renderAnswerSummary();
+      $('matrixRows').innerHTML = rules.map(r => `<tr><td>${r.when}</td><td>${r.adds.join('<br>')}</td><td>${r.why}</td></tr>`).join('');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    $('nextBtn').addEventListener('click', nextQuestion);
+    $('backBtn').addEventListener('click', backQuestion);
+    $('restartBtn').addEventListener('click', () => {
+      Object.keys(answers).forEach(k => delete answers[k]);
+      $('resultsCard').style.display = 'none';
+      $('questionCard').style.display = 'block';
+      renderStart();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+    renderStart();
+  </script>
+</body>
+</html>
