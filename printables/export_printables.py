@@ -6,13 +6,13 @@ exports = base / "exports"
 exports.mkdir(exist_ok=True)
 pages = [
     "clinic-promo-flyer.html",
+    "clinic-handout-decision-guide.html",
     "glp-lipo-onepager.html",
     "iv-membership-offer.html",
-    "clinic-handout-decision-guide.html",
 ]
 
 with sync_playwright() as p:
-    browser = p.chromium.launch()
+    browser = p.chromium.launch(args=["--no-sandbox"])
     page = browser.new_page(viewport={"width": 1100, "height": 1500}, device_scale_factor=2)
     for filename in pages:
         path = base / filename
