@@ -7,7 +7,8 @@
   <meta name="description" content="Free CrossFit Blaze peptides and biohacking Q&A clinic in Naples, FL. Bring your labs and learn lab-driven frameworks for fat loss, recovery, sleep, longevity, and performance.">
   <meta name="theme-color" content="#0071e3">
   <link rel="canonical" href="https://blazefit.github.io/gulfshorewellnessday310/peptides-clinic.html">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230071e3'/%3E%3Ctext x='32' y='43' text-anchor='middle' font-size='34' font-family='Arial' fill='white'%3EB%3C/text%3E%3C/svg%3E">
+  <link rel="icon" type="image/svg+xml" href="/gulfshorewellnessday310/favicon.svg">
+  <link rel="apple-touch-icon" href="/gulfshorewellnessday310/favicon.svg">
 
   <!-- Open Graph / Social Preview -->
   <meta property="og:type" content="website">
@@ -20,6 +21,15 @@
   <meta name="twitter:title" content="Free Peptides & Biohacking Clinic — CrossFit Blaze">
   <meta name="twitter:description" content="Free community Q&A clinic at CrossFit Blaze in Naples, FL. Bring your labs and get a clear framework.">
   <meta name="twitter:image" content="https://www.crossfitblaze.com/wp-content/uploads/2017/07/promo-crossfit.jpg">
+
+  <!-- Analytics: GA4 pageview + RSVP/call conversion events -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-ZYKQ8KS8WJ"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-ZYKQ8KS8WJ', { page_title: 'Peptides Clinic Landing Page' });
+  </script>
 
   <script type="application/ld+json">
   {
@@ -813,8 +823,26 @@
     document.getElementById('utmMedium').value = params.get('utm_medium') || '';
     document.getElementById('utmCampaign').value = params.get('utm_campaign') || '';
 
+    function trackClinicEvent(eventName, params = {}) {
+      if (typeof gtag === 'function') {
+        gtag('event', eventName, {
+          event_category: 'peptides_clinic',
+          ...params
+        });
+      }
+    }
+
+    document.querySelectorAll('a[href^="tel:"]').forEach((link) => {
+      link.addEventListener('click', () => trackClinicEvent('clinic_phone_call_clicked', { link_text: link.textContent.trim() }));
+    });
+
+    document.querySelectorAll('a[href="#rsvp"]').forEach((link) => {
+      link.addEventListener('click', () => trackClinicEvent('clinic_rsvp_cta_clicked', { link_text: link.textContent.trim() }));
+    });
+
     signupForm.addEventListener('submit', async (event) => {
       event.preventDefault();
+      trackClinicEvent('clinic_rsvp_form_started');
       signupSubmit.disabled = true;
       signupSubmit.textContent = 'Submitting...';
       formStatus.className = 'form-status';
@@ -833,6 +861,7 @@
         formStatus.className = 'form-status success';
         formStatus.textContent = 'You’re in — your RSVP was submitted. We’ll see you Saturday, May 16th at 10:00 AM.';
         signupSubmit.textContent = 'Submitted';
+        trackClinicEvent('clinic_rsvp_form_submitted', { primary_interest: document.getElementById('interest').value || 'not_selected' });
       } catch (error) {
         signupSubmit.disabled = false;
         signupSubmit.textContent = 'Reserve My Free Spot';

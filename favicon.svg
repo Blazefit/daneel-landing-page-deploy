@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="CrossFit Blaze favicon">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0071e3"/>
+      <stop offset="1" stop-color="#003a78"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M150 366L238 86h124l-64 134h92L242 426l38-164h-92l-38 104z" fill="#fff"/>
+</svg>
