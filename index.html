@@ -9,6 +9,7 @@
         // Import Firebase modules
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         
         // Firebase configuration
         const firebaseConfig = {
@@ -23,9 +24,11 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        
-        // Make db available globally
+        const auth = getAuth(app);
+
+        // Make db/auth available globally
         window.blazeDB = db;
+        window.blazeAuth = auth;
     </script>
     <style>
         * {
@@ -896,21 +899,74 @@
         });
         
         // Admin View Functions
+        //
+        // SECURITY: Access to attendee PII is NOT controlled by un-hiding the
+        // admin DOM section. It is enforced server-side by Firestore Security
+        // Rules (see firestore.rules), which only allow reads/deletes on the
+        // 'recoveryDaySignups' collection for authenticated admin accounts.
+        // This client-side gate requires a real Firebase Auth sign-in first and
+        // fails closed: if sign-in fails or the user is not an admin, the rules
+        // reject loadSignups()/deleteSignup() and no PII is exposed.
+        async function ensureAdminAuth() {
+            const { onAuthStateChanged, signInWithEmailAndPassword } =
+                await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+
+            // Resolve the current auth state once.
+            const currentUser = await new Promise((resolve) => {
+                const unsub = onAuthStateChanged(window.blazeAuth, (user) => {
+                    unsub();
+                    resolve(user);
+                });
+            });
+            if (currentUser) return currentUser;
+
+            // Not signed in — prompt for admin credentials and sign in.
+            const email = prompt('Admin email:');
+            if (!email) return null;
+            const password = prompt('Admin password:');
+            if (!password) return null;
+
+            const cred = await signInWithEmailAndPassword(window.blazeAuth, email, password);
+            return cred.user;
+        }
+
         async function showAdmin() {
+            // Fail closed: require authentication before revealing anything.
+            let user;
+            try {
+                user = await ensureAdminAuth();
+            } catch (error) {
+                console.error('Admin sign-in failed:', error);
+                alert('Sign-in failed. Admin access denied.');
+                return;
+            }
+            if (!user) {
+                alert('Admin authentication is required to view sign-ups.');
+                return;
+            }
+
             document.getElementById('adminSection').style.display = 'block';
             document.querySelector('.featured-event').style.display = 'none';
             document.getElementById('signupFormContainer').style.display = 'none';
             document.getElementById('signupSuccess').style.display = 'none';
             window.scrollTo({ top: document.getElementById('adminSection').offsetTop - 20, behavior: 'smooth' });
-            
-            // Load sign-ups from Firebase
+
+            // Load sign-ups from Firebase (Firestore rules still enforce admin-only read).
             await loadSignups();
         }
         
-        function hideAdmin() {
+        async function hideAdmin() {
             document.getElementById('adminSection').style.display = 'none';
             document.querySelector('.featured-event').style.display = 'block';
             window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Sign the admin out so the session does not silently persist.
+            try {
+                const { signOut } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js");
+                await signOut(window.blazeAuth);
+            } catch (error) {
+                console.error('Sign-out failed:', error);
+            }
         }
         
         async function loadSignups() {
