@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// Firestore Security Rules for blaze-calendar-signup
+//
+// SECURITY MODEL:
+//   - The public sign-up form (index.html) may CREATE signup documents only.
+//   - Listing (read) and deleting signups is restricted to authenticated
+//     admin accounts. The admin panel in index.html is NOT an access control
+//     boundary on its own — these rules are the real, server-enforced gate.
+//
+// An "admin" is any signed-in Firebase Auth user whose UID is listed in the
+// `admins/{uid}` collection (create that doc once in the Firebase console for
+// each trusted admin). This fails closed: if no admin doc exists, nobody can
+// read or delete signups.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid));
+    }
+
+    // Attendee PII. Public clients can only submit new signups; reading and
+    // deleting the collection requires an authenticated admin.
+    match /recoveryDaySignups/{docId} {
+      // Anyone may submit a signup, but only with the expected shape and no
+      // ability to mark themselves confirmed by an admin-only field.
+      allow create: if request.resource.data.keys().hasOnly([
+                         'firstName', 'lastName', 'email', 'classTime',
+                         'eventDate', 'eventName', 'signupDate', 'status'
+                       ])
+                    && request.resource.data.firstName is string
+                    && request.resource.data.lastName is string
+                    && request.resource.data.email is string;
+
+      // Listing/reading attendee PII and deleting records: admins only.
+      allow read, delete: if isAdmin();
+
+      // No client-side updates.
+      allow update: if false;
+    }
+
+    // Admin allowlist. Readable by signed-in users (so the client can verify
+    // its own admin status) but never writable from the client — manage these
+    // docs only from the Firebase console / a trusted server.
+    match /admins/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false;
+    }
+
+    // Deny everything else by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
